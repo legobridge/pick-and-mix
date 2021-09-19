@@ -3,7 +3,6 @@ import pprint
 import random
 import time
 
-
 practice_items_file_path = 'practice_items_template.csv'
 
 
@@ -21,14 +20,27 @@ def print_welcome(practice_items_to_minutes_map):
 
 
 def run_practice_loop(practice_item_map_list):
+    current_practice_item_map_list = practice_item_map_list.copy()
     practice_over = False
     while not practice_over:
-        next_practice_item = random.choice(practice_item_map_list)
+        if len(current_practice_item_map_list) == 0:
+            print('No more practice items left, ending practice session.')
+            practice_over = True
+            break
+
+        # Randomly select a practice item
+        next_practice_item = random.choice(current_practice_item_map_list)
+
+        # Prevent the same item from reoccurring in the same session
+        current_practice_item_map_list.remove(next_practice_item)
+
         item_name = next_practice_item[0]
         item_minutes = next_practice_item[1]
+
         print('Next Practice Item -\n{} - {} minutes\n'.format(item_name, item_minutes))
         print('Press Enter/Return to start.')
         input()
+
         for i in range(60 * item_minutes, -1, -1):
             minutes = i // 60
             seconds = i % 60
@@ -37,7 +49,8 @@ def run_practice_loop(practice_item_map_list):
             print('Time Remaining - {}:{}'.format(minutes, seconds), end="\r", flush=True)
             time.sleep(1)
         print('\a')
-        continue_practice_response = input('Continue practice? (y/n)')
+
+        continue_practice_response = input('Continue practicing (y/n)? ')
         if continue_practice_response.lower() != 'y':
             practice_over = True
             print('Bye!')
